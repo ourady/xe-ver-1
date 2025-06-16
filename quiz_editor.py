@@ -1,6 +1,3 @@
-# Let's verify and correct the content of quiz_editor.py
-
-# Here is the correct content for quiz_editor.py
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -41,5 +38,3 @@ def open_json_editor(app):
             json_content = file.read()
             app.quiz_text.insert(tk.END, json_content)
         messagebox.showinfo("Fichier sélectionné", f"Fichier JSON sélectionné : {json_file}")
-
-

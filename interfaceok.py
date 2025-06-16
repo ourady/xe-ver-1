@@ -12,7 +12,7 @@ import os
 import string
 import shutil
 
-from quiz_manager import QuizApp as QuizManagerApp
+from quiz_manager_mod import QuizApp as QuizManagerApp
 from file_manager import rename_and_move_files, unzip_file
 from quiz_editor import save_quiz, clear_quiz, select_json_file, open_json_editor
 from utils import search_files, search_text, open_html_in_browser
@@ -23,11 +23,9 @@ class QuizApp(tk.Tk):
         self.title("Quiz App")
         self.geometry("1200x800")
 
-        # Apply the 'clam' theme
         style = ttk.Style()
         style.theme_use('clam')
 
-        # Frame gauche : explorateur
         self.left_frame = tk.Frame(self, width=300, bg='lightgrey')
         self.left_frame.pack(side='left', fill='y')
 
@@ -53,14 +51,12 @@ class QuizApp(tk.Tk):
 
         self.populate_disk_menu()
 
-        # Frame centrale : onglets
         self.center_frame = tk.Frame(self, width=600, bg='white')
         self.center_frame.pack(side='left', fill='both', expand=True)
 
         self.notebook = ttk.Notebook(self.center_frame)
         self.notebook.pack(fill='both', expand=True)
 
-        # Onglet Éditeur de quiz
         self.quiz_frame = tk.Frame(self.notebook, bg='white')
         self.notebook.add(self.quiz_frame, text='Éditeur de quiz')
 
@@ -78,51 +74,44 @@ class QuizApp(tk.Tk):
         self.clear_quiz_button = tk.Button(self.quiz_frame, text="Vider la zone de quiz", command=lambda: clear_quiz(self))
         self.clear_quiz_button.pack(pady=10)
 
-        # Onglet Images
         self.image_frame = tk.Frame(self.notebook, bg='white')
         self.notebook.add(self.image_frame, text='Images')
 
         self.image_canvas = tk.Canvas(self.image_frame, bg='white')
         self.image_canvas.pack(pady=10, padx=(10, 0), fill='both', expand=True)
 
-        # Onglet HTML
         self.html_frame = tk.Frame(self.notebook, bg='white')
         self.notebook.add(self.html_frame, text='HTML')
 
         self.html_text = tk.Text(self.html_frame)
         self.html_text.pack(pady=10, padx=(10, 0), fill='both', expand=True)
 
-        # Exemple d'intégration dans un onglet existant
         self.open_html_button = tk.Button(self.html_frame, text="Ouvrir dans le navigateur", command=open_html_in_browser)
         self.open_html_button.pack(pady=10)
 
-        self.open_user_mgmt_button = tk.Button(self.html_frame, text="Ouvrir user_management.html", command=lambda: self.open_specific_html("user_management.html"))
-        self.open_user_mgmt_button.pack(pady=10)
+        self.open_authorized_html_button = tk.Button(self.html_frame, text="Ouvrir user_management.html", command=lambda: self.open_specific_html("user_management.html"))
+        self.open_authorized_html_button.pack(pady=10)
 
-        self.open_quiz_user_mgmt_button = tk.Button(self.html_frame, text="Ouvrir quiz_user_management.html", command=lambda: self.open_specific_html("quiz_user_management.html"))
-        self.open_quiz_user_mgmt_button.pack(pady=10)
+        self.open_authorized_html_button = tk.Button(self.html_frame, text="Ouvrir quiz_user_management.html", command=lambda: self.open_specific_html("quiz_user_management.html"))
+        self.open_authorized_html_button.pack(pady=10)
 
-        self.open_fichierquizz_button = tk.Button(self.html_frame, text="./fichierquizz", command=lambda: self.open_specific_html("./fichierquizz"))
-        self.open_fichierquizz_button.pack(pady=10)
+        self.open_authorized_html_button = tk.Button(self.html_frame, text="./fichierquizz", command=lambda: self.open_specific_html("./fichierquizz"))
+        self.open_authorized_html_button.pack(pady=10)
 
-        self.open_manager_button = tk.Button(self.html_frame, text="./fichierquizz/manager.html", command=lambda: self.open_specific_html("./fichierquizz/manager.html"))
-        self.open_manager_button.pack(pady=10)
+        self.open_authorized_html_button = tk.Button(self.html_frame, text="./fichierquizz/manager.html", command=lambda: self.open_specific_html("./fichierquizz/manager.html"))
+        self.open_authorized_html_button.pack(pady=10)
 
-        self.open_declencheur_auto_button = tk.Button(self.html_frame, text="declencheur_auto.html", command=lambda: self.open_specific_html("declencheur_auto.html"))
-        self.open_declencheur_auto_button.pack(pady=10)
+        self.open_authorized_html_button = tk.Button(self.html_frame, text="declencheur_auto.html", command=lambda: self.open_specific_html("declencheur_auto.html"))
+        self.open_authorized_html_button.pack(pady=10)
 
-        # Ajout du bouton pour lancer l'application Quiz
         self.lancer_quiz_app_button = tk.Button(self.html_frame, text="Lancer l'application Quiz", command=self.lancer_quiz_app)
         self.lancer_quiz_app_button.pack(pady=10)
 
-        # Charger le fichier HTML de gestion des utilisateurs au démarrage
         self.load_user_management_html()
 
-        # Frame droite : boutons utilitaires
         self.right_frame = tk.Frame(self, width=300, bg='lightgrey')
         self.right_frame.pack(side='right', fill='y')
 
-        # Boutons
         tk.Button(self.right_frame, text="Renommer et déplacer", command=lambda: rename_and_move_files(self)).pack(pady=5, padx=10, fill='x')
         tk.Button(self.right_frame, text="Décompresser un fichier", command=lambda: unzip_file(self)).pack(pady=5, padx=10, fill='x')
         tk.Button(self.right_frame, text="Sélectionner dossier d'images", command=self.select_image_directory).pack(pady=5, padx=10, fill='x')
@@ -147,6 +136,10 @@ class QuizApp(tk.Tk):
         self.search_text_button.pack(pady=5, padx=10, fill='x')
 
         self.selected_files = []
+
+        self.quiz_manager_frame = tk.Frame(self.notebook, bg='white')
+        self.notebook.add(self.quiz_manager_frame, text='Quiz Manager')
+        self.load_quiz_manager_interface()
 
     def populate_disk_menu(self):
         drives = [f"{d}:\\" for d in string.ascii_uppercase if os.path.exists(f"{d}:\\")]
@@ -267,8 +260,10 @@ class QuizApp(tk.Tk):
 
     def lancer_quiz_app(self):
         import subprocess
-        subprocess.Popen(["python", "quiz_manager.py"])
+        subprocess.Popen(["python", "quiz_manager_modifié.py"])
 
+    def load_quiz_manager_interface(self):
+        self.quiz_manager_app = QuizManagerApp(self.quiz_manager_frame)
 
 class MonInterface:
     def __init__(self, root):
@@ -278,36 +273,29 @@ class MonInterface:
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(expand=1, fill="both")
 
-        # Création des autres onglets...
         self.create_other_tabs()
 
-        # Création de l'onglet Quiz
         self.quiz_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.quiz_tab, text="Quiz")
         self.lancer_quiz_app_button = tk.Button(self.quiz_tab, text="Lancer l'application Quiz", command=self.lancer_quiz_app)
         self.lancer_quiz_app_button.pack(pady=10)
 
-        # Ajout du bouton pour charger les quiz
         self.lancer_quiz_button = tk.Button(self.quiz_tab, text="Charger les quiz", command=self.lancer_quiz)
         self.lancer_quiz_button.pack(pady=10)
 
     def create_other_tabs(self):
         self.admin_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.admin_tab, text="Admin")
-        # Ajoute d'autres onglets ici si nécessaire...
 
     def lancer_quiz(self):
         self.quiz_app = QuizManagerApp(self.quiz_tab, "./mes fichiers quiz html")
 
     def lancer_quiz_app(self):
         import subprocess
-        subprocess.Popen(["python", "quiz_manager.py"])
-
+        subprocess.Popen(["python", "quiz_manager_modifié.py"])
 
 if __name__ == "__main__":
+    
     app = QuizApp()
     app.mainloop()
-
-
-
 
